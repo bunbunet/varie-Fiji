@@ -1,0 +1,2 @@
+getDimensions(width, height, channels, slices, frames)
+run("Properties...", "channels=+"channels+" slices=+"slices" frames=+"frames+" unit=micron pixel_width=0.18 pixel_height=0.18 voxel_depth=0.98");

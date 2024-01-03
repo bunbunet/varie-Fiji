@@ -1,0 +1,10 @@
+Stack.setDisplayMode("color");
+Stack.setChannel(1);
+run("Green");
+Stack.setChannel(4);
+run("Cyan");
+Stack.setChannel(3);
+run("Cyan");
+Stack.setChannel(2);
+run("Red");
+Stack.setDisplayMode("composite");

@@ -1,0 +1,1 @@
+importClass(Packages.ij.WindowManager); WindowManager.getWindow("CP").setLocation(0, 0);

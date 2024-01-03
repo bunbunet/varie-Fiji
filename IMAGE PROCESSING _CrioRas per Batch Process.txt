@@ -1,0 +1,13 @@
+getDimensions(width, height, channels, slices, frames)
+run("Properties...", "channels=1 slices=1 frames=1 unit=micron pixel_width=35.15 pixel_height=35.15 voxel_depth=50");
+makeRectangle(428, 308, 294, 193);
+run("Crop");
+run("Subtract Background...", "rolling=40 light disable");
+run("Enhance Local Contrast (CLAHE)", "blocksize=127 histogram=256 maximum=3 mask=*None*");
+run("Unsharp Mask...", "radius=1 mask=0.50");
+run("Unsharp Mask...", "radius=40 mask=0.50");
+run("Rotate... ", "angle=180 grid=1 interpolation=None");
+
+
+
+
