@@ -1,0 +1,1 @@
+run("StackReg", "transformation=[Rigid Body]");
