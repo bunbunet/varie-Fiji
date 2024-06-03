@@ -11,10 +11,7 @@ for (i=0; i<10; i++) {
 	for(j=0; j<10; i++) {
 		open(dir1+list1[i]);
         imgName1=getTitle();
-        //run("Make Composite");
-        //run("Split Channels");
-        //Channel1="C1-"+ imgName1; 
-        print(imgName1+"_"+Channel1);    
+        print(imgName1+"_");    
 	    open(dir2+list2[i]);
 	    imgName2=getTitle();
         print(imgName2);
