@@ -1,5 +1,6 @@
 //@ File (label = "Input directory", style = "directory") dir
-//@ Boolean(label="MAX project?") max
+//@ String(label="Specify the ROIs tag (at the end of the name", value="MAX_ROIs.zip") Original_Format
+//@ Boolean(label="Do a MAX projection to draw?") max
 
 
 // This Macro allow to draw and save ROIs for multiple areas in all images in a folder 
@@ -21,7 +22,8 @@ for (i = 0; i < list.length; i++) {
          open(dir+File.separator+list[i]);
          Original_image =getImageID();
          getDimensions(width, height, channels, slices, frames);
-         tit = getTitle(); 
+         tit = getTitle();
+         titWext= File.nameWithoutExtension;
          
          if(max==true){
          	run("Z Project...", "projection=[Max Intensity]");
@@ -49,7 +51,8 @@ for (i = 0; i < list.length; i++) {
 		 	}
 		 }
 	  waitForUser("Click OK to save");
-	  roiManager("save", dir+ File.separator +tit+"_ROIs.zip") ;
+	  // recreate the ugly name of the masks and single channel images
+	  roiManager("save", dir+ File.separator +titWext+"MAX_ROIs.zip") ;
 	  close(); 	
 		 }
 	 }
