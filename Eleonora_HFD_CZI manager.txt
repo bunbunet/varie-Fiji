@@ -1,0 +1,27 @@
+czi	AutomaticZ	Series_Number	firstZ	z	scale	Pyramid	specimen	tag	Channels	LUTs
+SD.7_10xAxio.czi	TRUE	8	8	x	1	1	SD.7	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+SD.8_10xAxio.czi	TRUE	8	8	x	1	1	SD.8	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+SD.9_10xAxio.czi	TRUE	8	8	x	1	1	SD.9	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+SD.10_10xAxio.czi	TRUE	8	8	x	1	1	SD.10	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+SD.11_10xAxio.czi	TRUE	8	8	x	1	1	SD.11	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+SD.12_10xAxio.czi	TRUE	8	8	x	1	1	SD.12	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+SD.13_10xAxio.czi	TRUE	8	8	x	1	1	SD.13	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HD.14_10xAxio.czi	FALSE	8	x	8,16,24,32,40,48,56,64,72,80,88,96, X,104,112,120_sx,128_sx,136_sx,144_sx,152_sx,160_sx,112_dx,120_dx, 128_dx,136_dx,144_dx,152_dx,160_dx	1	1	HD.14	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HD.15_10xAxio.czi	TRUE	8	8	x	1	1	HD.15	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HD.16_10xAxio.czi	TRUE	8	8	x	1	1	HD.16	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HD.17_10xAxio.czi	FALSE	8	x	8,16,24,32,40,48,64,56,64,72,80,88,96,104,112,120,128,136,144,152,160	1	1	HD.17	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HD.18_10xAxio.czi	TRUE	8	8	x	1	1	HD.18	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HD.19_10xAxio.czi	FALSE	8	x	8,16,24,32,40,48,56,64,72,80,88,96,104,112,120,136,128,144,152,160,168,176	1	1	HD.19	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HDG.1_10xAxio.czi	TRUE	8	8	x	1	1	HDG.1	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HDG.2_10xAxio.czi	TRUE	8	8	x	1	1	HDG.2	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HDG.3_10xAxio.czi	TRUE	8	8	x	1	1	HDG.3	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HDG.4_10xAxio.czi	FALSE	8	x	8,16,24,40,32,48,56,64,72,80,88,96,104,112,120,128,144,136,152	1	1	HDG.4	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HDG.5_10xAxio.czi	TRUE	8	8	x	1	1	HDG.5	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HDG.6_10xAxio.czi	TRUE	8	8	x	1	1	HDG.6	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HDL.20_10xAxio.czi	FALSE	8	x	8,16,24,40,32,48,56,64,72,80,88,96,104,112,128,120,136,144,152,160,168,176	1	1	HDL.20	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HDL.21_10xAxio.czi	FALSE	8	x	8,16,24,32,40,48,56,64,72,80,88,96,104,112,120,128,136,152,144_dx,144,160,168	1	1	HDL.21	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HDL.22_10xAxio.czi	FALSE	8	x	8,16,24,32,40,48,56,64,72,80,88,96,104,112,120,128,136,144,152,168,160,176	1	1	HDL.22	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HDL.23_10xAxio.czi	TRUE	8	8	x	1	1	HDL.23	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HDL.24_10xAxio.czi	FALSE	8	x	8,16,24,32,40,48,56,64,72,80,88,96,112,104,120,128,136,144,152,160,168,176	1	1	HDL.24	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HDL.25_10xAxio.czi	FALSE	8	x	8,16,24,32,40,56,48,72,64,80,88,96,112,104,120,128,136,144,152,160,168,176,184	1	1	HDL.25	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HDL.26_10xAxio.czi	TRUE	8	8	x	1	1	HDL.26	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
