@@ -124,7 +124,7 @@ function processFile(input, output, file) {
 			// SAVE stack and/or MAX as multichannel image
 			if(save_MAX){
 			  	  if(slices==1){
-					saveAs("TIFF", MAX_Dir + File.separator + ImageName +"_single slice.tif");
+					saveAs("TIFF", MAX_Dir + File.separator + ImageName +".tif");
 				} else {
 					run("Z Project...", "projection=[Max Intensity]");
 					saveAs("TIFF", MAX_Dir + File.separator + ImageName +"_MAX.tif");
