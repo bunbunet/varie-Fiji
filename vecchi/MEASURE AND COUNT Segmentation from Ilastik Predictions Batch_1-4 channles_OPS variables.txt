@@ -1,0 +1,7 @@
+#@ File (label="Select stacks and ROIs directory", style = "directory") input
+#@ File (label="Select Predictions and Identities directory", style = "directory") Mask_dir //former Mask_path
+#@ File (label="Select directory to save Results", style = "directory") dir
+#@ Integer(label="Number of labels") number_of_labels
+#@ String(value="SEPARATE NAMES WITH COMMA (,)", visibility="MESSAGE") hints
+#@ String(label="Label Names") labels_names
+#@ String(label="Channel Names") channels_names

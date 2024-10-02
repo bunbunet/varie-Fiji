@@ -1,6 +1,6 @@
 //@ File (label = "Iutput directory", style = "directory") dir
 //@ File (label = "Output directory", style = "directory") dirOut
-//@String(label = "rotation", choices={"90-left", "90-Right", "180"}, style="radioButtonHorizontal") _ROTATION_
+//@String(label = "rotation", choices={"0", "90-left", "90-Right", "180"}, style="radioButtonHorizontal") _ROTATION_
 
 //@ Boolean(label="Register images?") register
 //@ Float (label = "Display Range MIN", value = "10") Display_MIN

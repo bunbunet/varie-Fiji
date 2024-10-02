@@ -67,7 +67,7 @@ for (k = 0; k < list.length; k++) {
 			 		 		 	
 		print("X_X_X_X_X_X_X_X_X_X_X_X_X_X_Processing: " + BaseName + " X_X_X_X_X_X_X_X_X_X_X_X_X_X_X");
 		print("Specimen: " + Specimen);
-		prin("Z level: " +  zValue);
+		print("Z level: " +  zValue);
 //------------ CHECK THE EXISTENCE OF SEGMENTATION MASKS AND FLUORESCENCE IMAGES FILES ----------------------------
 								
 //Identities and Predictions
@@ -186,7 +186,7 @@ for (k = 0; k < list.length; k++) {
 			roiManager("Open", Atlas_Dir+File.separator+list[k]);
 			count=roiManager("count");
 			// Loop trough all brain areas
-			for (v=1; v<count; v++) {// !!!! I'll skip the first ROI, that should be the merged image as it would take too long to import it !!! C H E C K   I T   O U T!!!
+			for (v=0; v<count; v++) {
 				selectImage(Identities);
 				roiManager("Select", v);
 				ROI_name=Roi.getName;

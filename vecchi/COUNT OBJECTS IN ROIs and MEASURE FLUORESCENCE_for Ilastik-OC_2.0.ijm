@@ -2,11 +2,11 @@
 #@ File (label="Fluorescence Images directory", style = "Directory") Dir
 #@ String(label="Channels names, separated by comma (,)") Channels
 #@ File (label="Predictions and Identities directory", style = "directory") Mask_dir 
-#@ File (label="Atlas Directory", style = "Directory") Atlas_Dir 
+#@ File (label="ROIs Directory", style = "Directory") Atlas_Dir 
 #@ File (label="Directory to save Results", style = "directory") Results_dir
 #@ String(value="TAGs specifying file types associated to the same section", visibility="MESSAGE") hint2
 #@ String(label="Segmentation Prefix") SegTag
-#@ String(label="Atlas ROIs tag") RoiTag
+#@ String(label="ROIs tag") RoiTag
 #@ String(label="Tag of result table") ResTag
 #@ String(label="Gray value of the Object Prediction label to analyze (set 0 if absent)") label_value
 #@ String(value="Saving Options", visibility="MESSAGE") hint3
@@ -14,10 +14,15 @@
 #@ Boolean(label="Save additiona object morphological features?") Save_object_features
 
 /*
- * This Macro loop to series of Fluorescenc Images, ROIs and Object Masks to measure object features and Fluo intensities within the ROIS. 
+ * This Macro loop through corresponding series of Fluorescenc Images, ROIs and Object Masks to measure object features and Fluorescence intensities within the ROIs. 
  * Analyzed objects must be labels in a 16-bit image inside a set of ROIs. A prediction image with a mask encoding object classes 
  * is accepted, the macro however process only class per run and the user should specify the Gray value of the desired label. 
  * It macro could be easily implemented to process multiple (or all) labelling.
+ * Measurements of each ROI-Image-Mask set are saved as tables in independent csv files. 
+ * Two outputs are produced: 1) A full list of objects annotated by their position, area and intensity values (MGVs)
+ * 							 2) A summary of the number of objects per Area. 
+ * 							 
+ * File names are expected to include the name of the Specimen and an ID of the image. 
  */
 
 
@@ -30,7 +35,6 @@ call("java.lang.System.gc");
 run("Clear Results");
 roiManager("reset");
 
-
 // Set a result sub-folder for the list of all objects
 FullResults_dir=Results_dir + File.separator + "Full_Obj_tables";
 File.makeDirectory(FullResults_dir);
@@ -38,11 +42,12 @@ File.makeDirectory(FullResults_dir);
 // Array to store lacking image or mask files
 fileNotFound=newArray();
 
-setBatchMode(true);
 run("3D Manager");
 // set measurements options, all objects are counted, including those touching the borders (exclude_objects_on_edges_xy is not included)
 run("3D Manager Options", "volume surface compactness 3d_moments integrated_density mean_grey_value std_dev_grey_value feret centroid_(pix) bounding_box drawing=Contour");
-			
+
+setBatchMode(true);			
+									
 // Loop through the Atlas ROIs produced by the Macro that analyzed segmentation
 list=getFileList(Atlas_Dir);
 
@@ -55,38 +60,37 @@ for (k = 0; k < list.length; k++) {
 		// get Zvalue and specimen name
 		roiManager("Open", Atlas_Dir+File.separator+list[k]);
 		titWext= list[k];
-		BaseName=replace(titWext,RoiTag+".zip","");
+		BaseName=replace(titWext,"_"+RoiTag+".zip","");
 		splittedName=split(BaseName, "_");
 		Specimen=splittedName[0];
 		print("Specimen: "+Specimen);
-		zString = getSubstring(titWext, "_z", "_");
+		zString = getSubstring(titWext, "_s","_"+ RoiTag);
 		zValue = NaN; //or whatever to tell you that you could not read the value
 			 if(zString!="") {
 	   			zValue=parseInt(zString); //parseFloat if not always an integer value
 			 }
-			 		 		 	
-		print("X_X_X_X_X_X_X_X_X_X_X_X_X_X_Processing: " + BaseName + " X_X_X_X_X_X_X_X_X_X_X_X_X_X_X");
-		print("Specimen: " + Specimen);
-		prin("Z level: " +  zValue);
+		print("Section ID: "+zValue);	 		 		 	
+		print("X_X_X_X_X_X_X_X_X_X_X_X_X_X_Processing: " + BaseName + "X_X_X_X_X_X_X_X_X_X_X_X_X_X_X");
+
 //------------ CHECK THE EXISTENCE OF SEGMENTATION MASKS AND FLUORESCENCE IMAGES FILES ----------------------------
 								
 //Identities and Predictions
-		
-		Ident_Ok=false;
 		Prediction_Ok=false;
-		
 		if (label_value==0) {
 			Prediction_Ok=true;
 		} else {
 			Mask_path = Mask_dir + File.separator +SegTag+"-"+ BaseName + "_Object Predictions.tiff";
-			//print("SEARCHING: " +SegTag+"-"+ BaseName + "_Object Predictions.tiff");
+			print("SEARCHING: " +SegTag+"-"+ BaseName + "_Object Predictions.tiff");
 			if(File.exists(Mask_path)){
 				print("Mask file found");
 				Prediction_Ok=true;
 			}
 		}
-				
-		//print("SEARCHING: "+SegTag+"-"+ BaseName + "_Object Identities.tiff");
+		
+		
+			 
+		print("SEARCHING: "+SegTag+"-"+ BaseName + "_Object Identities.tiff");
+		Ident_Ok=false;
 		Ident_path = Mask_dir+File.separator+SegTag+"-"+ BaseName+"_Object Identities.tiff";
 		if(File.exists(Mask_path)){
 			print("Identities file found");
@@ -120,7 +124,7 @@ for (k = 0; k < list.length; k++) {
 
 //--------------------------------------------- ANALYZE IMAGES -------------------------------------------------------	
 			
-	if(Ident_Ok && Prediction_Ok && FluoImages.length>0) {
+	if(Ident_Ok==true && Prediction_Ok==true && FluoImages.length>0) {
 			
 //--------------Initialize arrays to store the number of objects per brain area---------------------------------------
 			

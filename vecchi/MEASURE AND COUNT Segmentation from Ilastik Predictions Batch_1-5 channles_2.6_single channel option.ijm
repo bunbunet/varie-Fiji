@@ -9,12 +9,19 @@
 #@ String (label="ROIs tag (after original file name) (write x to skip)") ROItag
 #@ String(value="Labels and Channels. SEPARATE NAMES WITH COMMA (,)", visibility="MESSAGE") hints3
 #@ String(label="Label Names (1 to n)") labels_names
-#@ String(label="Channel Names (Max 4)") channels_names
-
+#@ String(label="Channel Names (Max 5)") channels_names
+#@ String(label="Labels to exclude (integers separated by comma)") background
+#@ Boolean(label="Save 3D ROIs") ROIs3D_save
 
 if(ROItag=="x"){
 	ROItag="";
 }
+
+if(tag=="x"){
+	tag="";
+}
+
+background=split(background,",");
 
 /* This macro measure the fluorescence intensity and the number of objects in .tif segmented stack images for up to four channel images.
  *  all files present in a folder can be processed in batch
@@ -79,6 +86,10 @@ for (l = 0; l < InputList.length; l++) {
 	Mask_path = Mask_dir + File.separator + tag + titWext + "_Object Predictions.tiff";
 	Ident_path = Mask_dir+File.separator+ tag +titWext+"_Object Identities.tiff";
 	
+	print("searching " + titWext + ROItag + ".zip");
+	print("searching "+ tag + titWext + "_Object Predictions.tiff");
+	print("searching "+ tag +titWext+"_Object Identities.tiff");
+	
 	if(File.exists(ROI_path)){
 		print("ROIs file found");
 	}
@@ -91,7 +102,7 @@ for (l = 0; l < InputList.length; l++) {
 	
 	// If all files exists the image is processed, otherwise its name is added to the file_not_found list
 	// could be modified so that if the ROI file is lacking all the cells are counted on 
-	if(File.exists(ROI_path) && File.exists(Mask_path) && File.exists(Ident_path)) {							
+	if(File.exists(Mask_path) && File.exists(Ident_path)) {							
 		
 		// Extract slice details from the filename
 		// Names are expectd to be composed by: ExperimentalGroup.ID_Region_zLevel_pz_ other stuff
@@ -100,13 +111,24 @@ for (l = 0; l < InputList.length; l++) {
 		Specimen=splittedName[0];
 		splittedAnimal=split(splittedName[0],".");
 		Group=splittedAnimal[0];
+		AnimalId=splittedAnimal[1];
 		zLevel=splittedName[1];
-		SlideCoord=splittedName[2];
-		pz=splittedName[3];
-
+		//SlideCoord=splittedName[2];
+		//pz=splittedName[1];
+		
 		// Open the image associated ROIs
 		roiManager("reset");
-		roiManager("Open", ROI_path);
+		if(File.exists(ROI_path)){
+			roiManager("Open", ROI_path);
+			print("opening ROI file");
+		} else {
+			selectImage(FluoImage);
+			run("Select All");
+			roiManager("Add");
+			roiManager("select", 0);
+			roiManager("Rename", "all");
+			print("selecting the entire image");	
+		}
 		
 		// create an array with the ROIs names, that will be passed to the Process Nuclei Function
 		ROI_names=newArray();
@@ -123,7 +145,7 @@ for (l = 0; l < InputList.length; l++) {
 			Area_value=Array.concat(Area,Area_value);
 		}	
 
-		run("Clear Results");	
+				run("Clear Results");	
 		for (i = 0; i < number_of_ROIs; i++) {
 			setResult("GroupM", i, Group);
 			setResult("Animal_id", i, Specimen);
@@ -133,7 +155,8 @@ for (l = 0; l < InputList.length; l++) {
 		}
 		saveAs("Results", ROIs_Areas+File.separator+tit+"_ROI_areas.csv"); 
 		run("Clear Results");			
-				
+		
+					
 											
 			//---------------PROCESS NUCLEI----------------------------------------------------------
 			
@@ -155,6 +178,7 @@ for (l = 0; l < InputList.length; l++) {
 		var ch2_mgv=newArray();
 		var ch3_mgv=newArray();
 		var ch4_mgv=newArray();
+		var ch5_mgv=newArray();
 	
 		run("3D Manager");
 		run("3D Manager Options", "volume surface compactness 3d_moments integrated_density mean_grey_value std_dev_grey_value feret centroid_(pix) drawing=Contour");
@@ -176,46 +200,51 @@ for (l = 0; l < InputList.length; l++) {
 		}
 		for (i = 0; i < number_of_labels; i++) {
 			selectImage(Predictions);
-			run("Select Label(s)", "label(s)="+i+1);
-			Temp=getTitle();
-			Ext.Manager3D_SelectAll();
-			Ext.Manager3D_Delete();
-			Ext.Manager3D_AddImage();
-				// erase unwanted cells from the Identities images of all other labels 
-			for (k = 0; k < number_of_labels; k++) {
-				if(k+1 != i+1){
-					selectWindow("Identities_"+k+1);
-					Ext.Manager3D_Select(0);
-					Ext.Manager3D_FillStack(0, 0, 0);
+			if(!contains(background,i+1)) {
+				run("Select Label(s)", "label(s)="+i+1);
+				Temp=getTitle();
+				Ext.Manager3D_SelectAll();
+				Ext.Manager3D_Delete();
+				Ext.Manager3D_AddImage();
+					// erase unwanted cells from the Identities images of all other labels 
+				for (k = 0; k < number_of_labels; k++) {
+					if(k+1 != i+1){
+						selectWindow("Identities_"+k+1);
+						Ext.Manager3D_Select(0);
+						Ext.Manager3D_FillStack(0, 0, 0);
+					}
 				}
-			}
 			close(Temp);
+			}
 		}
 				
 			
 //-----------------ANALYZE INDIVIDUAL CHANNELS WITH Process Nuclei Function---------------------
 			selectImage(FluoImage);
-			run("Split Channels");
+			if(Orig_channels>1){
+				run("Split Channels");
+			}else{
+				rename("C1-"+tit);
+			}
 			
 			// Complete cells (enterely included in the volume) MUST BE processed first, 
 			// they must contain the tag "Complete"
-			// At each passage the processed cells are earased from the original mask
+			// At each passage the processed cells are earased by filling with dark from the original mask
 			// In this way the remaining cells are the incomplete cells.
 			// filling can be de-activated by setting the last variable to 0 (1 is for filling)
 			// the variable required by "Process_Nuclei" function are: (LABEL,ROI,Nuclei_tag,Area_tag,complete_tag,filling)
 			// complete_tag must be either "Complete" or "Incomplete".
 			// see below for further information on the function variables
 			
-			// Loop trough labels and ROIs to Process Nucleiù
-			// If only one slice is present there is no need to distinguish between complete and incomplete cells
-			if (Original_slices<2){
-					for (i = 0; i < number_of_labels; i++) {
+			// If the image is single slice all cells will be incomplete and there is no need to fill 
+			if (Orig_slices==1) {
+				for (i = 0; i < number_of_labels; i++) {
 					for(k = 0; k < number_of_ROIs; k++){
-						Process_Nuclei(i+1,k,labels_names[i],ROI_names[k],"",1);
+						Process_Nuclei(i+1,k,labels_names[i],ROI_names[k],"Incomplete",0);
 					}
 				}
-			}
-			else{
+			} else {
+				// Loop trough labels and ROIs to Process Nuclei
 				// Complete cells First
 				for (i = 0; i < number_of_labels; i++) {
 					for(k = 0; k < number_of_ROIs; k++){
@@ -230,16 +259,15 @@ for (l = 0; l < InputList.length; l++) {
 					}
 				}
 			}
-			
-			
 			// create results Table with all SegObj nuclei measurements and annotations
 			run("Clear Results");
 			for(i=0;i<SegObj_labels.length;i++){
 				setResult("GroupM", i, Group);
-				setResult("Animal_id", i, Specimen);
-				setResult("SlideCoordinates", i, SlideCoord);
+				setResult("Specimen", i, Specimen);
+				setResult("AnimalId", i, AnimalId);
+				//setResult("SlideCoordinates", i, SlideCoord);
 				setResult("zLevel", i, zLevel);
-				setResult("pz", i, pz);
+				//setResult("pz", i, pz);
 				setResult("ImageName", i, tit);
 				setResult("label", i, SegObj_labels[i]);
 				setResult("name", i, SegObj_names[i]);
@@ -262,6 +290,9 @@ for (l = 0; l < InputList.length; l++) {
 				}
 				if (Orig_channels>3) {
 				setResult(channels_names[3] + "_mgv",i, ch4_mgv[i]);
+				}
+				if (Orig_channels>4) {
+				setResult(channels_names[4] + "_mgv",i, ch5_mgv[i]);
 				}
 			
 			}		
@@ -317,7 +348,7 @@ SegObj_seg=getImageID();
 // also getting the title to close it at the end (I don't know how to close with the imageID
 SegObj_seg_tit=getTitle();
 
-//import nuclei in 3D manager, only those included in the selected ROIs will be imported
+//import nuclei in 3D manager
 Ext.Manager3D_SelectAll();
 Ext.Manager3D_Delete();
 roiManager("Select", ROI);
@@ -350,9 +381,11 @@ if (Nb_of_objects>0){
 	}
 // Save the 3D ROIs and the full Measure table	
 	Ext.Manager3D_SelectAll();
-	//Ext.Manager3D_Save(ROIs3D_Dir+ File.separator + tit+"_SegObjobj_3Droi_"+Type_tag+".zip");
+	if(ROIs3D_save){
+		Ext.Manager3D_Save(ROIs3D_Dir+ File.separator + tit+"_SegObjobj_3Droi_"+Type_tag+".zip");
+	}
 	Ext.Manager3D_Measure();
-	//Ext.Manager3D_SaveResult("M",TXT_Dir + File.separator + tit+"_SegObjobj_Volumes_"+Type_tag+".txt");
+	Ext.Manager3D_SaveResult("M",TXT_Dir + File.separator + tit+"_SegObjobj_Volumes_"+Type_tag+".txt");
 	Ext.Manager3D_CloseResult("M");
 
 // Measure fluorescence levels in channels
@@ -404,6 +437,17 @@ if (Nb_of_objects>0){
 			Ext.Manager3D_SaveResult("Q",TXT_Dir + File.separator + tit+"_SegObjobj_"+channels_names[3]+"_"+Type_tag+".txt");
 			Ext.Manager3D_CloseResult("Q");
 	}
+	if (Orig_channels>4) {
+		selectWindow("C5-"+tit);	
+		for(i=0;i<Nb_of_objects;i++){
+			 Ext.Manager3D_Quantif3D(i,"Mean",mgv); // quantification, use IntDen, Mean, Min,Max, Sigma
+			 ch5_mgv=Array.concat(ch5_mgv,mgv);
+		}
+		// Save the full quatification table		
+			Ext.Manager3D_Quantif();
+			Ext.Manager3D_SaveResult("Q",TXT_Dir + File.separator + tit+"_SegObjobj_"+channels_names[4]+"_"+Type_tag+".txt");
+			Ext.Manager3D_CloseResult("Q");
+	}
 
 if (filling==1){
 	selectImage(SegObj_seg);
@@ -418,12 +462,9 @@ if (filling==1){
 	//close(SegObj_seg_tit);
 }
 
-// This function find a string 
-function getSubstring(string, prefix, postfix) {
-   start=indexOf(string, prefix)+lengthOf(prefix);
-   end=start+indexOf(substring(string, start), postfix);
-   if(start>=0&&end>=0)
-     return substring(string, start, end);
-   else
-     return "";
+function contains( array, value ) {
+    for (i=0; i<array.length; i++) 
+        if ( array[i] == value ) return true;
+    return false;
 }
+
