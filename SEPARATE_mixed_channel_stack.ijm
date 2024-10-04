@@ -8,7 +8,8 @@ image=getImageID();
 for (g = 1; g <= nChannels; g++) {
 	planes="1";// to set a variable as a string the first item must be a string.
 	
-	for (i = g; i < slices-1/nChannels; i+=nChannels) {
+	//for (i = g; i < slices-1/nChannels; i+=nChannels) {
+	  for (i = g; i <= slices; i+=nChannels);
 		planes=planes+","+i;
 		}
 		
