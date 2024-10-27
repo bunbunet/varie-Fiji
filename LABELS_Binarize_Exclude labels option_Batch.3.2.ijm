@@ -35,6 +35,7 @@ for (l = 0; l < InputList.length; l++) {
 			if(selectionType()!=-1){ 
 				run("Fill", "slice");
 				}
+			run("Select None");
 			}
 		}
 
