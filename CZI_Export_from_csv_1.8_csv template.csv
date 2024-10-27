@@ -1,0 +1,9 @@
+czi	AutomaticZ	Series_Number	firstZ	z	scale	Pyramid	specimen	tag	Channels	LUTs
+SD.7_10xAxio.czi	TRUE	8	8	x	1	1	SD.7	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+SD.8_10xAxio.czi	TRUE	8	8	x	1	1	SD.8	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+SD.9_10xAxio.czi	TRUE	8	8	x	1	1	SD.9	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+SD.10_10xAxio.czi	TRUE	8	8	x	1	1	SD.10	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+SD.11_10xAxio.czi	TRUE	8	8	x	1	1	SD.11	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+SD.12_10xAxio.czi	TRUE	8	8	x	1	1	SD.12	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+SD.13_10xAxio.czi	TRUE	8	8	x	1	1	SD.13	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
+HD.14_10xAxio.czi	FALSE	8	x	8,16,24,32,40,48,56,64,72,80,88,96, X,104,112,120_sx,128_sx,136_sx,144_sx,152_sx,160_sx,112_dx,120_dx, 128_dx,136_dx,144_dx,152_dx,160_dx	1	1	HD.14	10xAxio.czi_	DAPI,GLUT4,WFA,PV 	Blue,Cyan,Red,Green
