@@ -12,9 +12,6 @@
 
 labels=split(labels,",");
 
-run("3D Manager");
-run("3D Manager Options", "volume surface compactness 3d_moments integrated_density mean_grey_value std_dev_grey_value feret centroid_(pix) drawing=Contour");
-
 setBatchMode(true);
 InputList = getFileList(input);
 print("files in stack directory: "+InputList.length);
