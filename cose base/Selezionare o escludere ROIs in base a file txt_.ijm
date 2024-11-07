@@ -19,7 +19,7 @@ roiManager("add");
 
 
 print("ROIs not excluded");
-for (i = 0; i < roiManager("count"); i++) {
+for (i = roiManager("Count")-1; i >= 0; i--){ 
 	roiManager("select", i);
 	Region_index=Roi.getName;
 	if (!contains(areas_to_exclude,Region_index)) {
