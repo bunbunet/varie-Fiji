@@ -7,7 +7,7 @@
 // Images can be stack or single plane, MAX projection can be produced checking the "MAX project" option
 // For convinience a list of predefined names is presented, however during drawing Areas can be skipped, other names can be added at will.
 // Add the name of the areas that you want to draw in the array list called Areas (between "" and separated by commas)
-Areas=newArray("SVZdx","SVZsx","STRdx","STRsx");
+Areas=newArray("");
 print("Areas to draw:");
 for (j =0; j<Areas.length; j++) {
 	print(Areas[j]);
