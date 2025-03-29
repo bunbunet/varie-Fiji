@@ -26,7 +26,7 @@ for (i = 0; i < list.length; i++) {
          	selectImage(Original_image);
          	close(); 
          }
-         if(File.exists(ROI_dir+ File.separator +titWext+"_"+tag+".zip"){
+         if(File.exists(ROI_dir+ File.separator +titWext+"_"+tag+".zip")){
 		 	roiManager("Open", ROI_dir+ File.separator +titWext+"_"+tag+".zip");        
 			 roiManager("Show All");
 			 waitForUser("Adjust ROIs than click ok to Save them?"); 
