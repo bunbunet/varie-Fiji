@@ -410,9 +410,12 @@ print("---------------------PROCESSING:"+Type_tag+ "------------------------");
 // when processing complete cells the 3D manager is set as to exclude objects that touch the upper or lower focal plane. 
 
 if(complete_tag=="Complete"){ 
-	run("3D Manager Options", "volume surface compactness 3d_moments integrated_density mean_grey_value std_dev_grey_value feret centroid_(pix) bounding_box exclude_objects_on_edges_xy exclude_objects_on_edges_z drawing=Contour");
+	// feret takes a long time to compute and by default it is skipped
+	//run("3D Manager Options", "volume surface compactness 3d_moments integrated_density mean_grey_value std_dev_grey_value feret centroid_(pix) bounding_box exclude_objects_on_edges_xy exclude_objects_on_edges_z drawing=Contour");
+	run("3D Manager Options", "volume surface compactness 3d_moments integrated_density mean_grey_value std_dev_grey_value centroid_(pix) bounding_box exclude_objects_on_edges_xy exclude_objects_on_edges_z");
 } else {
-	run("3D Manager Options", "volume surface compactness 3d_moments integrated_density mean_grey_value std_dev_grey_value feret centroid_(pix) bounding_box exclude_objects_on_edges_xy drawing=Contour");
+	//run("3D Manager Options", "volume surface compactness 3d_moments integrated_density mean_grey_value std_dev_grey_value feret centroid_(pix) bounding_box exclude_objects_on_edges_xy drawing=Contour");
+	run("3D Manager Options", "volume surface compactness 3d_moments integrated_density mean_grey_value std_dev_grey_value centroid_(pix) bounding_box exclude_objects_on_edges_xy");
 }
 
 // select the image carrying the nuclei type 
@@ -482,7 +485,7 @@ if (Nb_of_objects>0){
 		}
 	// Save the full quatification table	
 	Ext.Manager3D_Quantif();
-	Ext.Manager3D_SaveResult("Q",TXT_Dir + File.separator + tag+"-"+ BaseName+"_SegObjobj_"+channels_names[0]+"_"+Type_tag+".txt");
+	Ext.Manager3D_SaveResult("Q",TXT_Dir + File.separator + tag+"-"+ BaseName+"_SegObjobj_"+channels_names[1]+"_"+Type_tag+".txt");
 	Ext.Manager3D_CloseResult("Q");
 	}
 
@@ -494,7 +497,7 @@ if (Nb_of_objects>0){
 		}
 	// Save the full quatification table	
 	Ext.Manager3D_Quantif();
-	Ext.Manager3D_SaveResult("Q",TXT_Dir + File.separator + tag+"-"+ BaseName+"_SegObjobj_"+channels_names[0]+"_"+Type_tag+".txt");
+	Ext.Manager3D_SaveResult("Q",TXT_Dir + File.separator + tag+"-"+ BaseName+"_SegObjobj_"+channels_names[2]+"_"+Type_tag+".txt");
 	Ext.Manager3D_CloseResult("Q");
 	}		
 	
@@ -506,7 +509,7 @@ if (Nb_of_objects>0){
 		}
 	// Save the full quatification table	
 	Ext.Manager3D_Quantif();
-	Ext.Manager3D_SaveResult("Q",TXT_Dir + File.separator + tag+"-"+ BaseName+"_SegObjobj_"+channels_names[0]+"_"+Type_tag+".txt");
+	Ext.Manager3D_SaveResult("Q",TXT_Dir + File.separator + tag+"-"+ BaseName+"_SegObjobj_"+channels_names[3]+"_"+Type_tag+".txt");
 	Ext.Manager3D_CloseResult("Q");
 	}
 
@@ -518,7 +521,7 @@ if (Nb_of_objects>0){
 		}
 	// Save the full quatification table	
 	Ext.Manager3D_Quantif();
-	Ext.Manager3D_SaveResult("Q",TXT_Dir + File.separator + tag+"-"+ BaseName+"_SegObjobj_"+channels_names[0]+"_"+Type_tag+".txt");
+	Ext.Manager3D_SaveResult("Q",TXT_Dir + File.separator + tag+"-"+ BaseName+"_SegObjobj_"+channels_names[4]+"_"+Type_tag+".txt");
 	Ext.Manager3D_CloseResult("Q");
 	}
 		if (FluoImages.length>5) {
@@ -529,7 +532,7 @@ if (Nb_of_objects>0){
 		}
 	// Save the full quatification table	
 	Ext.Manager3D_Quantif();
-	Ext.Manager3D_SaveResult("Q",TXT_Dir + File.separator + tag+"-"+ BaseName+"_SegObjobj_"+channels_names[0]+"_"+Type_tag+".txt");
+	Ext.Manager3D_SaveResult("Q",TXT_Dir + File.separator + tag+"-"+ BaseName+"_SegObjobj_"+channels_names[5]+"_"+Type_tag+".txt");
 	Ext.Manager3D_CloseResult("Q");
 		}
 		if (FluoImages.length>6) {
@@ -540,7 +543,7 @@ if (Nb_of_objects>0){
 		}
 // Save the full quatification table	
 	Ext.Manager3D_Quantif();
-	Ext.Manager3D_SaveResult("Q",TXT_Dir + File.separator + tag+"-"+ BaseName+"_SegObjobj_"+channels_names[0]+"_"+Type_tag+".txt");
+	Ext.Manager3D_SaveResult("Q",TXT_Dir + File.separator + tag+"-"+ BaseName+"_SegObjobj_"+channels_names[6]+"_"+Type_tag+".txt");
 	Ext.Manager3D_CloseResult("Q");
 	
 	}
@@ -552,7 +555,7 @@ if (Nb_of_objects>0){
 		}
 // Save the full quatification table	
 	Ext.Manager3D_Quantif();
-	Ext.Manager3D_SaveResult("Q",TXT_Dir + File.separator + tag+"-"+ BaseName+"_SegObjobj_"+channels_names[0]+"_"+Type_tag+".txt");
+	Ext.Manager3D_SaveResult("Q",TXT_Dir + File.separator + tag+"-"+ BaseName+"_SegObjobj_"+channels_names[7]+"_"+Type_tag+".txt");
 	Ext.Manager3D_CloseResult("Q");
 	}
 	
