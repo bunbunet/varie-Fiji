@@ -1,8 +1,8 @@
 // @File(label = "Input directory", style = "directory") dir
 // @String(label = "File Format", value = ".tiff") format
-// @Boolean(label="Save for QuickNII or Deepslice?(s based sequence instead of z") quick
+// @Boolean(label="Save for QuickNII or Deepslice?(s based sequence instead of z)") quick
 
-scale=0.2;
+scale=0.15;
 
 output_dir=dir+File.separator+"QuickNII";
 File.makeDirectory(output_dir);

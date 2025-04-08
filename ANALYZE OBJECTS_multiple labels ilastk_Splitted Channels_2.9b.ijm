@@ -5,7 +5,7 @@
 #@ File (label="Select Predictions and Identities directory", style = "directory") Mask_dir 
 #@ File (label="Select directory to save Results", style = "directory") dir
 #@ Boolean(label="Save 3D suite full features Object tables (M)?") Fluo_M
-#@ Boolean(label="Save 3D suite full Fluo Object tables of Fluo (Q)?") Fluo_Q
+#@ Boolean(label="Save 3D suite full Fluo Object tables (Q)?") Fluo_Q
 #@ Boolean(label="Add Group and Specimen names to result table (eg. Group.ID_other stuff)?") Group_Spec
 #@ String(value="TAGS", visibility="MESSAGE") hints2
 #@ String (label="Predictions & Identitis tag (before original file name) (write x to skip)") tag
@@ -102,22 +102,24 @@ InputList = getFileList(input);
 print("files in stack directory: "+InputList.length);
 for (l = 0; l < InputList.length; l++) {
 	if (endsWith(InputList[l], image_format)) {
+		
+		// remove the extension from the BaseName
+		SplitName=File.getNameWithoutExtension(input + File.separator +InputList[l]);
+		print(SplitName);
 		// Get the Basename
-		SplitName=split(InputList[l],"-");
+		SplitName=split(SplitName,"-");
 		BaseName="";
 		for(s = 1; s<SplitName.length; s++){
 			BaseName=BaseName+SplitName[s];
 		}
-		// remove the extension from the BaseName
-		BaseName=StripExtension(BaseName);
+
 		if(Group_Spec){
 			Specimen=split(BaseName,"_");
 			Specimen=Specimen[0];
 			GroupM=split(Specimen,".");
 			GroupM=GroupM[0];
 		}
-		
-		
+				
 	//------ PROCESS ONLY IF IMAGES WITH THE SAME BASE NAME HAVE NOT ALREADY BEEN PROCESSED-------------
 		if(!contains(fileProcessed,BaseName)) {
 			// if not,add it to the list of already processed images
