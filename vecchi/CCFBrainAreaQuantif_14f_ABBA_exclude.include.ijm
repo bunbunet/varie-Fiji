@@ -97,7 +97,7 @@ for (k = 0; k < list.length; k++) {
 		// e.g. Fmr-Ko2_quickNII_s072.png
 		roiManager("Open", Atlas_Dir+File.separator+list[k]);
 		titWext= list[k];
-		tag_replace=ROIs_tag+".zip";
+		tag_replace=ROIs_Tag+".zip";
 		BaseName=replace(titWext,tag_replace,"");// the ABBA zip file include also the .tif extension of the original image
 		splittedName=split(BaseName, "_");
 		Specimen=splittedName[0];
@@ -178,7 +178,7 @@ for (k = 0; k < list.length; k++) {
 // the ROI names are expected on a single lines separated by commas
 if (Exclude) {
 	areas_to_exclude=split(File.openAsString(Atlas_Dir+File.separator+"areas_to_exclude.txt"), ",");
-	 for (i = 0; i < roiManager("count"); i++) {
+	for (i = roiManager("Count")-1; i >= 0; i--){ 
 		roiManager("select", i);
 		Region_index=Roi.getName;
 		if (contains(areas_to_exclude,Region_index)) {
@@ -191,7 +191,7 @@ if (Exclude) {
 // the ROI names are expected on a single lines separated by commas
 if (Include) {
 	areas_to_include=split(File.openAsString(Atlas_Dir+File.separator+"areas_to_include.txt"), ",");
-	 for (i = 0; i < roiManager("count"); i++) {
+	 for (i = roiManager("Count")-1; i >= 0; i--){ 
 		roiManager("select", i);
 		Region_index=Roi.getName;
 		if (!contains(areas_to_include,Region_index)) {

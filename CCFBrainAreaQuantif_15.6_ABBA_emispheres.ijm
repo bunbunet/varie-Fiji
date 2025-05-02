@@ -1,20 +1,22 @@
 #@ String(value="FLUORESCENCE IMAGES", visibility="MESSAGE") hints
 #@ File (label="Fluorescence Images directory", style = "Directory") Dir
-#@ String(label="Channels names, separated by comma (,)") Channels
+#@ String(label="Channels names, separated by comma (,) add calibrated images first") Channels
 #@ String(value="SEGMENTATION MASKS", visibility="MESSAGE") hints2
 #@ File (label="segmentation masks directory", style = "Directory") Mask_Dir
 #@ String(label="Prefix of segmentation images (e.g. WFA-) leave blank if absent") ChRefTag
 #@ String(label="Tag of segmented mask (after the base name e.g. Simple Segmentation)") SegTag
 #@ String(label="Segmentation name (to name the results)") AnalysisTag
 #@ Integer(label="Label gray level: ", value="") lbl
+#@ Boolean(label="Include only Areas indicated in areas_to_include.csv? (in the ROIs directory)") Include
 #@ String(value="ATLAS ROIs", visibility="MESSAGE") hints3
 #@ File (label="Atlas Directory", style = "Directory") Atlas_Dir
 #@ String(label="ROIs tag, afer base Name and befor .zip(write x if absent)") ROIs_Tag
+#@ String(label="Emispheres (if ROI file include Left/Right ROIs)",choices={"Left", "Right", "Both"},style="radioButtonHorizontal") Emisphere
 #@ Boolean(label="Exclude Areas indicated in areas_to_exclude.csv?  (in the ROIs directory)") Exclude
 #@ Boolean(label="Include only Areas indicated in areas_to_include.csv? (in the ROIs directory)") Include
 #@ String(value="OUTPUTS", visibility="MESSAGE") hints4
 #@ File (label="Directory to Save Results", style = "Directory") Save_Dir
-#@ String(value="Indicate channel names separated by comma (e.g. PV,WFA)", visibility="MESSAGE") hints5
+#@ String(value="Indicate channel names separated by comma (e.g. PV,WFA), write x to skip", visibility="MESSAGE") hints5
 #@ String(label="Save Segmentation Cropped fluorescence images for channels: ") Save_SegCrop
 
 
@@ -61,11 +63,12 @@ run("Clear Results");
 roiManager("reset");
 
 //create csv Directories
-CSV_Dir= Save_Dir +File.separator+"csv";
-Seg_Dir= Save_Dir +File.separator+"PNN_crop";
+CSV_Dir= Save_Dir +File.separator+AnalysisTag+"_csv";
+Seg_Dir= Save_Dir +File.separator+AnalysisTag+"_crop";
 File.makeDirectory(CSV_Dir);
-File.makeDirectory(Seg_Dir);
-
+if(Save_SegCrop=="x"){
+	File.makeDirectory(Seg_Dir);
+}
 
 setBatchMode(true);
 
@@ -98,9 +101,10 @@ for (k = 0; k < list.length; k++) {
 		roiManager("Open", Atlas_Dir+File.separator+list[k]);
 		titWext= list[k];
 		tag_replace=ROIs_Tag+".zip";
-		BaseName=replace(titWext,tag_replace,"");// the ABBA zip file include also the .tif extension of the original image
+		BaseName=replace(titWext,".zip","");
+		print("BaseName:"+ BaseName);
 		splittedName=split(BaseName, "_");
-		Specimen=splittedName[0];
+		Specimen=splittedName[0]+"_"+splittedName[1]+"_"+splittedName[2];
 		print("Specimen: "+Specimen);
 		zString = getSubstring(titWext, "_z", "_");
 		zValue = NaN; //or whatever to tell you that you could not read the value
@@ -123,6 +127,7 @@ for (k = 0; k < list.length; k++) {
 	for (i=0; i<channel_names.length;i++) {
 		Img= channel_names[i]+"-" + BaseName + ".tif";
 		Img_path=Dir + File.separator + Img;
+		print("searching: " + Img );
 		if(File.exists(Img_path)) {
 			open(Img_path);
 			tit=getImageID();
@@ -133,7 +138,10 @@ for (k = 0; k < list.length; k++) {
 		}
 	}
 	print(FluoImages.length + " Channels Found");
-
+	
+	selectImage(FluoImages[0]);
+	getPixelSize(scaleUnit, pixelWidth, pixelHeight);
+	
 	// SEGMENTATION IMAGES
 		// Two types of segmentated masks (from Ilastik) are expected: 
 		// Whole area, Individual Objects (divided into identities encoding the indivudual objects and predictions encoding the object types)
@@ -162,10 +170,16 @@ for (k = 0; k < list.length; k++) {
 		var Ch2_MGVs=newArray();	   // Mean Gray Value of the whole Ch2 stain by Region
 		var Ch3_MGVs=newArray();	   // Mean Gray Value of the whole Ch3 stain by Region
 		var Ch4_MGVs=newArray();	   // Mean Gray Value of the whole Ch4 stain by Region
+		var Ch5_MGVs=newArray();	   // Mean Gray Value of the whole Ch4 stain by Region
+		var Ch6_MGVs=newArray();	   // Mean Gray Value of the whole Ch4 stain by Region
+		var Ch7_MGVs=newArray();	   // Mean Gray Value of the whole Ch4 stain by Region
 		var Seg_Ch1MGVs=newArray();    // Mean Gray Value of the Ch1 stain inside the mask by Region
 		var Seg_Ch2MGVs=newArray();    // Mean Gray Value of the Ch2 stain inside the mask by Region
 		var Seg_Ch3MGVs=newArray();    // Mean Gray Value of the Ch3 stain inside the mask by Region
-		var Seg_Ch4MGVs=newArray();    // Mean Gray Value of the Ch3 stain inside the mask by Region
+		var Seg_Ch4MGVs=newArray();    // Mean Gray Value of the Ch4 stain inside the mask by Region
+		var Seg_Ch5MGVs=newArray();    // Mean Gray Value of the Ch5 stain inside the mask by Region
+		var Seg_Ch6MGVs=newArray();    // Mean Gray Value of the Ch6 stain inside the mask by Region
+		var Seg_Ch7MGVs=newArray();    // Mean Gray Value of the Ch7 stain inside the mask by Region
 		
 // Note that it could be nice to dynamically create variables only for existing channels, but I'm not sure if and how can be don in macro language
 // However, Through conditional statements the macro can adapt to images having up to four channels. 
@@ -173,6 +187,56 @@ for (k = 0; k < list.length; k++) {
 //-------------------------------	ANALYZE MGV --------------------------------------------------------
  		
 		run("Set Measurements...", "area mean reDirect=None decimal=4");
+
+// remove the ROIs of one emisphere if necessary. 
+if (Emisphere!="Both") {
+	// invert left and Right	
+	if (Emisphere=="Left") {
+		RoiCrop="Right"; // to work with AND
+	} else {
+		RoiCrop="Left";
+	}
+	
+	// find the index of Left ROI
+	nRois=roiManager("count");
+	lastROI=nRois;
+	names=newArray(); // add names to an array to evaluate the presence of the ROIs
+	for (i = 0; i < nRois; i++) {
+		roiManager("select", i);
+		name=Roi.getName;
+		names=Array.concat(names,name);
+		if (name==RoiCrop) {
+			print("found at "+i);
+			RoiCropIndex=i;
+			}
+	}
+	
+	if(contains(names, RoiCrop)){// if the Crop ROI is not present skip
+		for (i = 0; i < nRois; i++) {
+			if(i==RoiCropIndex){
+				RoiCropIndex=RoiCropIndex+1;
+				} else {
+						roiManager("select",0);
+						name=Roi.getName;
+						roiManager("select", newArray(0,RoiCropIndex-i));
+						roiManager("AND");
+					  	if (selectionType()==-1){ // if the crope remove all the area
+					  		print(i+"-"+name + " completely removed");
+					  		lastROI=lastROI-1; //the total number of ROIs is reduced by 1
+					  	} else {
+					  		roiManager("add");
+							roiManager("select",lastROI);
+							roiManager("rename", name);
+					  	}
+					  	roiManager("deselect");
+						roiManager("select",0); // delete the uncropped ROI
+						roiManager("delete");	
+					}
+		}
+	} else {
+		print(RoiCrop + " ROI Not Found");// ROIs are left as they are
+	}
+}
 
 // If the option was selected, Delete from ROI manager the areas listed in the areas_to_exclude.txt file that is expected in the ROIs directory
 // the ROI names are expected on a single lines separated by commas
@@ -254,6 +318,36 @@ if (Include) {
 	 			Ch4_MGVs=Array.concat(Ch4_MGV,Ch4_MGVs);
 	 			}
  			}
+ 		if (FluoImages.length>4) {
+	 	selectImage(FluoImages[4]);			
+			for (v=0; v<number_of_Areas; v++) {
+				run("Clear Results");
+	 			roiManager("Select", v);
+	 			roiManager("Measure");
+	 			Ch5_MGV=getResult("Mean", 0);
+	 			Ch5_MGVs=Array.concat(Ch5_MGV,Ch5_MGVs);
+	 			}
+ 			}
+ 		if (FluoImages.length>5) {
+	 	selectImage(FluoImages[5]);			
+			for (v=0; v<number_of_Areas; v++) {
+				run("Clear Results");
+	 			roiManager("Select", v);
+	 			roiManager("Measure");
+	 			Ch6_MGV=getResult("Mean", 0);
+	 			Ch6_MGVs=Array.concat(Ch6_MGV,Ch6_MGVs);
+	 			}
+ 			}
+ 		if (FluoImages.length>6) {
+	 	selectImage(FluoImages[6]);			
+			for (v=0; v<number_of_Areas; v++) {
+				run("Clear Results");
+	 			roiManager("Select", v);
+	 			roiManager("Measure");
+	 			Ch7_MGV=getResult("Mean", 0);
+	 			Ch7_MGVs=Array.concat(Ch7_MGV,Ch7_MGVs);
+	 			}
+ 			}
 //-------------------------------  DELETE FLUORESCENCE OUTSIDE THE SEGMENTATION   ----------------------------------------------
 		
 		//Convert to an array the list of channels to save
@@ -262,11 +356,17 @@ if (Include) {
 		//Convert the Segmentation to Mask and invert it
 
 		open(Mask_path);
+		run("Properties...", "pixel_width="+pixelWidth+" pixel_height="+ pixelHeight+" voxel_depth=1.0000000");
 		Mask=getImageID();
 		setThreshold(lbl, lbl, "raw");
+		setForegroundColor(0, 0, 0);
+		setBackgroundColor(255, 255, 255);
+		setOption("BlackBackground", true);
 		run("Convert to Mask");
-		run("Invert");
-		run("Grays");
+		run("Invert"); // to subtract from the fluoresence
+		// verify the mask
+		//saveAs("Tiff", Save_Dir + File.separator + BaseName + AnalysisTag + "_mask.tif");	
+		
 		//Loop trough all the images to delete signal outside the segmented area
 		for (i = 0; i < FluoImages.length; i++) {
 			imageCalculator("Subtract", FluoImages[i],Mask);
@@ -285,46 +385,75 @@ if (Include) {
 		// Analyze MGV in channel 1	segmented area
 		// ( as we already populated the Area and 
 				
-		for (v=0; v<number_of_Areas; v++) {
-			selectImage(FluoImages[0]);	
-			run("Clear Results");
- 			roiManager("Select", v);
- 			roiManager("Measure");	
-			Seg_Ch1MGV=getResult("Mean", 0);
-			Seg_Ch1MGVs=Array.concat(Seg_Ch1MGV,Seg_Ch1MGVs);	
+			for (v=0; v<number_of_Areas; v++) {
+				selectImage(FluoImages[0]);	
+				run("Clear Results");
+	 			roiManager("Select", v);
+	 			roiManager("Measure");	
+				Seg_Ch1MGV=getResult("Mean", 0);
+				Seg_Ch1MGVs=Array.concat(Seg_Ch1MGV,Seg_Ch1MGVs);	
  		}
  		// Analyze Additional channels if present
 	 	if (FluoImages.length>1) {
 	 		selectImage(FluoImages[1]);			
-		for (v=0; v<number_of_Areas; v++) {
-			run("Clear Results");
- 			roiManager("Select", v);
- 			roiManager("Measure");	
-			Seg_Ch2MGV=getResult("Mean", 0);
-			Seg_Ch2MGVs=Array.concat(Seg_Ch2MGV,Seg_Ch2MGVs);
-	 		}
+			for (v=0; v<number_of_Areas; v++) {
+				run("Clear Results");
+	 			roiManager("Select", v);
+	 			roiManager("Measure");	
+				Seg_Ch2MGV=getResult("Mean", 0);
+				Seg_Ch2MGVs=Array.concat(Seg_Ch2MGV,Seg_Ch2MGVs);
+		 		}
 	 	} 
 	 	if (FluoImages.length>2) {
 	 		selectImage(FluoImages[2]);			
-		for (v=0; v<number_of_Areas; v++) {
-			run("Clear Results");
- 			roiManager("Select", v);
- 			roiManager("Measure");	
-			Seg_Ch3MGV=getResult("Mean", 0);
-			Seg_Ch3MGVs=Array.concat(Seg_Ch3MGV,Seg_Ch3MGVs);
-	 		}
+			for (v=0; v<number_of_Areas; v++) {
+				run("Clear Results");
+	 			roiManager("Select", v);
+	 			roiManager("Measure");	
+				Seg_Ch3MGV=getResult("Mean", 0);
+				Seg_Ch3MGVs=Array.concat(Seg_Ch3MGV,Seg_Ch3MGVs);
+		 		}
 	 	} 
 	 	if (FluoImages.length>3) {
 	 		selectImage(FluoImages[3]);			
-		for (v=0; v<number_of_Areas; v++) {
-			run("Clear Results");
- 			roiManager("Select", v);
- 			roiManager("Measure");	
-			Seg_Ch4MGV=getResult("Mean", 0);
-			Seg_Ch4MGVs=Array.concat(Seg_Ch4MGV,Seg_Ch4MGVs);
-	 		}
+			for (v=0; v<number_of_Areas; v++) {
+				run("Clear Results");
+	 			roiManager("Select", v);
+	 			roiManager("Measure");	
+				Seg_Ch4MGV=getResult("Mean", 0);
+				Seg_Ch4MGVs=Array.concat(Seg_Ch4MGV,Seg_Ch4MGVs);
+		 		}
 	 	} 
-	 	
+	 	if (FluoImages.length>4) {
+	 		selectImage(FluoImages[4]);			
+			for (v=0; v<number_of_Areas; v++) {
+				run("Clear Results");
+	 			roiManager("Select", v);
+	 			roiManager("Measure");	
+				Seg_Ch5MGV=getResult("Mean", 0);
+				Seg_Ch5MGVs=Array.concat(Seg_Ch5MGV,Seg_Ch5MGVs);
+		 		}
+	 	} 
+	 	if (FluoImages.length>5) {
+	 		selectImage(FluoImages[5]);			
+			for (v=0; v<number_of_Areas; v++) {
+				run("Clear Results");
+	 			roiManager("Select", v);
+	 			roiManager("Measure");	
+				Seg_Ch6MGV=getResult("Mean", 0);
+				Seg_Ch6MGVs=Array.concat(Seg_Ch6MGV,Seg_Ch6MGVs);
+		 		}
+	 	} 
+	 	if (FluoImages.length>6) {
+	 		selectImage(FluoImages[6]);			
+			for (v=0; v<number_of_Areas; v++) {
+				run("Clear Results");
+	 			roiManager("Select", v);
+	 			roiManager("Measure");	
+				Seg_Ch7MGV=getResult("Mean", 0);
+				Seg_Ch7MGVs=Array.concat(Seg_Ch7MGV,Seg_Ch7MGVs);
+		 		}
+	 	} 	
 //-------------------------------	ANALYZE SEGMENTATION AREA --------------------------------------------------------
 		// using the formula Area of the Mask= AreaRegion*(MGV of the white filled Segmentation Mask/255)
 		
@@ -354,6 +483,7 @@ if (Include) {
 				setResult(AnalysisTag + "_Area", i, Seg_areas[i]);
 				AreaFraction=Seg_areas[i]/Region_areas[i];
 				setResult(AnalysisTag + "_Area_Fraction",i,AreaFraction);
+				
 				setResult(channel_names[0] + "_MGV", i, Ch1_MGVs[i]);
 				setResult(channel_names[0]+"_" + AnalysisTag+".MGV", i, Seg_Ch1MGVs[i]/AreaFraction); 
 				//MGV of the segmented area were collected over the entire area, but keeping only the pixels inside the mask and and must thus be scaled by the Mask Area Fraction
@@ -369,6 +499,18 @@ if (Include) {
 				if(FluoImages.length>3){
 				setResult(channel_names[3] + "_MGV", i, Ch4_MGVs[i]);
 				setResult(channel_names[3]+"_" + AnalysisTag+"_MGV", i, Seg_Ch4MGVs[i]/AreaFraction);
+				}
+				if(FluoImages.length>4){
+				setResult(channel_names[4] + "_MGV", i, Ch5_MGVs[i]);
+				setResult(channel_names[4]+"_" + AnalysisTag+"_MGV", i, Seg_Ch5MGVs[i]/AreaFraction);
+				}
+				if(FluoImages.length>5){
+				setResult(channel_names[5] + "_MGV", i, Ch6_MGVs[i]);
+				setResult(channel_names[5]+"_" + AnalysisTag+"_MGV", i, Seg_Ch6MGVs[i]/AreaFraction);
+				}
+				if(FluoImages.length>6){
+				setResult(channel_names[6] + "_MGV", i, Ch7_MGVs[i]);
+				setResult(channel_names[6]+"_" + AnalysisTag+"_MGV", i, Seg_Ch7MGVs[i]/AreaFraction);
 				}
 			}
 					
