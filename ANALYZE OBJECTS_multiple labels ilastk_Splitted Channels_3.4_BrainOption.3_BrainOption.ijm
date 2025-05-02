@@ -23,9 +23,9 @@ image_format=".tif";
 //--------ROI OPTIONS: exclude - include ROIs and choOse emisphere (for Brain analyses)--------------------------
 
 //Emispheres (if ROI file include Left/Right ROIs)",choices={"Left", "Right", "Both"},style="radioButtonHorizontal") 
-Emisphere="Both"; // "Left", "Right", "Both"
+Emisphere="Left"; // "Left", "Right", "Both"
 //Exclude Areas indicated in areas_to_exclude.csv?  (in the ROIs directory)")
-Exclude=false;
+Exclude=true;
 //Include only Areas indicated in areas_to_include.csv? (in the ROIs directory)") 
 Include=false;
 
