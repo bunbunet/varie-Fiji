@@ -46,7 +46,11 @@ for (l = 0; l < InputList.length; l++) {
 		}
 		
 		saveAs("tiff", output+File.separator+tag+Img);
+		
 	}
+	// before start processing a new file close all and release memory
+  			run("Close All");
+			call("java.lang.System.gc");
 }
 print("Done!");
 
