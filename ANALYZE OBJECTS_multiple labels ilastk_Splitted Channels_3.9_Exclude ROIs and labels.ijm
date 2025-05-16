@@ -8,7 +8,7 @@
 #@ String (label="Predictions & Identitis tag (before original file name) (write x to skip)") tag
 #@ String (label="ROIs tag (after original file name) (write x to skip)") ROItag
 #@ String(value="LABEL AND CHANNEL NAMES. Separate with comma without spaces (,)", visibility="MESSAGE") hints4
-//#@ String(label="Label to exclude (by gray value, separated by comma, write x to skip)") labels_to_exclude
+//#@ String(label="Label to exclude (by gray value, separated by comma, write x to skip)") labels_to_exclude 
 #@ String(label="Label Names (0 to n - 255 MAX) included only") labels_names
 #@ String(label="Channels names, separated by comma (,)") channels_names
 #@ String(value="SAVING OPTIONS", visibility="MESSAGE") hints5
@@ -21,8 +21,8 @@
 // file format of the fluorescence images  (masks are assumed in .tiff as exported by Ilastik)
 image_format=".tif";
 
-labels_to_exclude=newArray(0,4); // write here the gray level of the labels to exclude separated by comma. 
-//(PUT UNDER "" IF THE LIST IS OF A SINGLE LABEL,OTHERWISE IT WILL BE INTERPRETED AS THE NUMBER OF OBJECTS IN THE ARRAY )
+labels_to_exclude=newArray("0"); // write here the gray level of the labels to exclude separated by comma. Keep the 0, "" can be skipped for more than 1 values
+//(PUT UNDER "" IF LISTING A SINGLE LABEL, OTHERWISE IT WILL BE INTERPRETED AS THE NUMBER OF OBJECTS IN THE ARRAY ALL ASSIGNED TO 0)
 
 //--------ROI OPTIONS: exclude - include ROIs and choOse emisphere (for Brain analyses)--------------------------
 
