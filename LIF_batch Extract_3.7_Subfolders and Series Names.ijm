@@ -116,7 +116,7 @@ function processFile(input, output, file) {
 			orig=getImageID();
 			getDimensions(width, height, channels, slices, frames);
 			
-			ImageName=Title +name+"_"+s+1;
+			ImageName=Title +"_"+name+"_"+s+1;
 			print("Exporting : " + ImageName);
 			if (save_stack) {
 				saveAs("TIFF", Stacks_Dir +File.separator + ImageName+".tif");

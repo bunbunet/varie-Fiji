@@ -21,15 +21,15 @@
 // file format of the fluorescence images  (masks are assumed in .tiff as exported by Ilastik)
 image_format=".tif";
 
-labels_to_exclude=newArray("0"); // write here the gray level of the labels to exclude separated by comma. Keep the 0, "" can be skipped for more than 1 values
-//(PUT UNDER "" IF LISTING A SINGLE LABEL, OTHERWISE IT WILL BE INTERPRETED AS THE NUMBER OF OBJECTS IN THE ARRAY ALL ASSIGNED TO 0)
+labels_to_exclude=newArray(0,254); // write here the gray level of the labels to exclude separated by comma. Keep the 0,254.
+//(DO NOT LIST LIST SINGLE LABELS, OTHERWISE IT WILL BE INTERPRETED AS THE NUMBER OF OBJECTS IN THE ARRAY, ALL ASSIGNED TO 0)
 
 //--------ROI OPTIONS: exclude - include ROIs and choOse emisphere (for Brain analyses)--------------------------
 
 //Emispheres (if ROI file include Left/Right ROIs)",choices={"Left", "Right", "Both"},style="radioButtonHorizontal") 
-Emisphere="Left"; // "Left", "Right", "Both"
+Emisphere="Both"; // "Left", "Right", "Both"
 //Exclude Areas indicated in areas_to_exclude.csv?  (in the ROIs directory)")
-Exclude=true;
+Exclude=false;
 //Include only Areas indicated in areas_to_include.csv? (in the ROIs directory)") 
 Include=false;
 

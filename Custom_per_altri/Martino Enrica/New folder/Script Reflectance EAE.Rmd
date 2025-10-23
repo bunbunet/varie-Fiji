@@ -1,0 +1,64 @@
+---
+title: "Reflectance Analysis"
+output: html_document
+date: "2025-08-18"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#Set the Working Directory
+path<-"C:/Users/marto/Laboratorio/Experiments/EAE PM/Reflectance/Results"
+knitr::opts_knit$set(root.dir = path)
+library(dplyr)
+```
+
+## R Markdown
+
+```{r}
+#Nome della sottocartella che contiene i csv
+dir<-paste0(path,"/result_tables")
+
+files <- list.files(dir,pattern = "*.csv", full.names = TRUE)
+
+TableM <- plyr::ldply(files, readr::read_csv)
+
+dir<-paste0(path,"/result_tables_AF")
+
+files <- list.files(dir,pattern = "*.csv", full.names = TRUE)
+
+TableAF <- plyr::ldply(files, readr::read_csv)
+```
+```{r}
+TableM2 <-TableM %>% select(-AreaPercRemoved, -Ref_AreaFraction) %>%mutate(mg=paste(Specimen,Section.ID,Region))
+TableAF <-TableAF %>%mutate(mg=paste(Specimen,Section.ID,Region))
+
+TableM3 <-merge(TableAF,TableM2,by="mg") 
+```
+
+
+```{r}
+write.csv(TableM, paste0(path,"/Result Tables.csv"))
+
+```
+```{r}
+TableM_summary<- TableM %>% group_by(Specimen,Region) %>% 
+  summarise(n=n(), 
+            AreaT=sum(Area),
+            DAPI_intDen=sum(DAPI_MGV),
+            Ref1_intDen=sum(Ref1_MGV),
+            Ref2_intDen=sum(Ref2_MGV),
+            Ref_IntDen=sum(Ref_MGVsum),
+            AreaSeg=sum(Ref_AreaFraction*Area)/100) %>%
+  mutate(DAPI_MGV=DAPI_intDen/AreaT,
+         Ref1_MGV=Ref1_intDen/AreaT,
+         Ref2_MGV=Ref2_intDen/AreaT,
+         Ref_MGVsum=Ref_IntDen/AreaT,
+         Ref_AreaFraction=(AreaSeg/AreaT)*100) %>%
+  mutate(Group = case_when(
+    grepl("PM", Specimen, ignore.case = TRUE) ~ "PM",
+    grepl("sal", Specimen, ignore.case = TRUE) ~ "sal",
+    TRUE ~ "other"  
+  ))
+write.csv(TableM_summary, paste0(path,"/Reflection Summary.csv"))
+```
+
