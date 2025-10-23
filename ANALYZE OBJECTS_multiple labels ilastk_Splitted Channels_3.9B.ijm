@@ -30,7 +30,7 @@ labels_to_exclude=newArray(0,4,254); // write here the gray level of the labels 
 //Emispheres (if ROI file include Left/Right ROIs)",choices={"Left", "Right", "Both"},style="radioButtonHorizontal") 
 Emisphere="Both"; // "Left", "Right", "Both"
 //Exclude Areas indicated in areas_to_exclude.csv?  (in the ROIs directory)")
-Exclude=true;
+Exclude=false;
 //Include only Areas indicated in areas_to_include.csv? (in the ROIs directory)") 
 Include=false;
 
@@ -181,6 +181,7 @@ for (l = 0; l < InputList.length; l++) {
 		SplitName=split(SplitName,"-");
 		BaseName="";
 		for(s = 1; s<SplitName.length; s++){
+			if (s > 1) BaseName = BaseName + "-";
 			BaseName=BaseName+SplitName[s];
 		}
 
