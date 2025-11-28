@@ -29,15 +29,15 @@ for(i=0;i<nResults;i++){
 		Y = getResult("Y", i);
 		if (name=="PV") {
 			run("Roi Defaults...", "color=yellow stroke=1 group=0");
-			makeOval(X, Y, circle_size/pixelWidth, circle_size/pixelHeight);
+			makeOval(X-(circle_size/2,) (Y-circle_size/2), circle_size/pixelWidth, circle_size/pixelHeight);
 			
 		} else if(name=="PNN") {
 			run("Roi Defaults...", "color=yellow stroke=1 group=2");
-			makeOval(X, Y, circle_size/pixelWidth, circle_size/pixelHeight);
+			makeOval(X-(circle_size/2,) (Y-circle_size/2), circle_size/pixelWidth, circle_size/pixelHeight);
 			
 		}  else if(name=="PV-PNN-PV" || name=="PNN-PNN-PV") {
 			run("Roi Defaults...", "color=yellow stroke=1 group=3");
-			makeOval(X, Y, circle_size/pixelWidth, circle_size/pixelHeight);
+			makeOval(X-(circle_size/2,) (Y-circle_size/2), circle_size/pixelWidth, circle_size/pixelHeight);
 		} else {
 			makePoint(X, Y);
 		}
