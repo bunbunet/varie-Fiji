@@ -1,11 +1,11 @@
 // This Macro Drow circles or points based on names and coordinates of a csv file
 // Csv file is expected to include coordinates in columns named X,Y,Z and point name in a column named ROI
 
-channels_names=newArray("Ki67");
+channels_names=newArray("Ki67","SOX2");
 
 //Path to CSV and Images
 var Csv_path="C:/Users/feder/Documents/LAB/ProgettoQA/SOX2/Sox2_J/Export/SOX9_coordinates/";
-Image_path="C:/Users/feder/Documents/LAB/ProgettoQA/SOX2/Sox2_J/Export/SOX9_coordinates/SplitChannels/";
+Img_dir="C:/Users/feder/Documents/LAB/ProgettoQA/SOX2/Sox2_J/SplitChannels";
 
 // Circle size in microns
 circle_size=10;
@@ -15,7 +15,7 @@ CicleType1="SOX9 .";
 CicleType2="DCX .";
 CicleType3="Ki67 .";
 
-draw_others=true;
+draw_others=false;
 
 //----------------------------------------MACRO RUN-------------------------------------------------
 
@@ -30,6 +30,8 @@ Orig_Name=getTitle();
 BaseName=replace(Orig_Name, "DCX-", "");
 BaseName=replace(BaseName, ".tif", "");
 CsvName=BaseName+".csv"
+
+print("Base Name: " + BaseName);
 
 Csv_path = Csv_path + File.separator  + CsvName
 print(Csv_path);
@@ -59,7 +61,7 @@ for(i=0;i<nResults;i++){
 		    makeOval(X - circle_size/2, Y - circle_size/2, circle_size, circle_size);
 		
 		} else {
-			if(draw_others{
+			if(draw_others){
 			    Stack.setSlice(Z);
 			    makePoint(X, Y);
 		    }
@@ -81,7 +83,7 @@ waitForUser;
 //-----------------open other channels
 for (i=0; i<channels_names.length;i++) {
 				Img= channels_names[i]+"-" + BaseName + ".tif";
-				Img_path=Image_path + File.separator + Img;
+				Img_path=Img_dir + File.separator + Img;
 				print("Searching: " + Img);
 				if(File.exists(Img_path)) {
 					open(Img_path);
