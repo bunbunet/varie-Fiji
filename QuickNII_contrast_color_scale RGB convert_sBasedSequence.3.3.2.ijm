@@ -1,6 +1,8 @@
-// @File(label = "Input directory", style = "directory") dir
-// @String(label = "File Format", value = ".tiff") format
-// @Boolean(label="Save for QuickNII or Deepslice?(s based sequence instead of z)") quick
+#@ File(label = "Input directory", style = "directory") dir
+#@ String(label = "File Format", value = ".tiff") format
+#@ Boolean(label="Save for QuickNII or Deepslice?(s based sequence instead of z)") quick
+#@ String(label="Histogram Min-Max method",choices={"manual", "enhance contrast","none"}, style="radioButtonHorizontal") contrast
+
 
 scale=0.15;
 
@@ -8,17 +10,16 @@ output_dir=dir+File.separator+"QuickNII";
 File.makeDirectory(output_dir);
 
 // SET CHANNELS MIN AND MAX (for more channels add values to array in line 33)
-ch1_min_max="5,80";
-ch2_min_max="5,80";
-ch3_min_max="5,30";
-ch4_min_max="0,255";
-ch5_min_max="255,255";
+ch1_min_max="5,20";
+ch2_min_max="10,60";
+ch3_min_max="100,255";
+ch4_min_max="255,255";
 
 // SET CHANNELS LUTS (for more channels add values to array in line 34)
-ch1_LUT="Grays"
-ch2_LUT="Green"
-ch3_LUT="Red"
-ch4_LUT="Blue"
+ch1_LUT="Green"
+ch2_LUT="Red"
+ch3_LUT="Blue"
+ch4_LUT="Magenta"
 ch5_LUT="Grays"
 
 //Set the processsing of the images. (leave blank to skip, don't comment out)
@@ -27,11 +28,11 @@ function processImages() {
 	//run("Unsharp Mask...", "radius=3 mask=0.60 stack"); 
 }
 
-setBatchMode(true); 
+//setBatchMode(true); 
 run("Clear Results");
 
 // 
-min_max=newArray(ch1_min_max,ch2_min_max,ch3_min_max,ch4_min_max,ch5_min_max);
+min_max=newArray(ch1_min_max,ch2_min_max,ch3_min_max,ch4_min_max);
 LUT_names=newArray(ch1_LUT,ch2_LUT,ch3_LUT,ch4_LUT,ch5_LUT);
 
 // Create Two Arrays to store the name of single focal planes and their z position
@@ -62,18 +63,26 @@ for (i=0; i<list.length; i++) {
 			getDimensions(width, height, channels, slices, frames);
 			print("Channels:"+channels);
 			print("Slices"+slices);
-  	
+  			
+  			
             for (c = 0; c < channels; c++) {
-				Stack.setChannel(c);
-				values=split(min_max[c],",");
-				setMinAndMax(parseInt(values[0]),parseInt(values[1]));
+				Stack.setChannel(c+1);
+				if(contrast=="manual"){
+					values=split(min_max[c],",");
+					setMinAndMax(parseInt(values[0]),parseInt(values[1]));
+				}
+				if(contrast=="enhance contrast"){
+					run("Enhance Contrast", "saturated=0.35");
+				}
 				run(LUT_names[c]);
-			}
+				
+  			}
 			if (slices>1) {
 				run("Z Project...", "projection=[Max Intensity]");
 			}
-			run("Apply LUT");
-			//run("RGB Color");
+			
+			Stack.setDisplayMode("composite");
+			run("RGB Color");
 			
 			// rewrite the name in s based sequence with 3 digits numbers
 			sValue=zValue;
@@ -81,14 +90,14 @@ for (i=0; i<list.length; i++) {
 				sValue=IJ.pad(zValue, 3);
 			}
 			name=replace(imgName, "_z"+zValue, "_s"+sValue);
-            saveAs("tif", output_dir+File.separator+name);
+            saveAs("png", output_dir+File.separator+name);
+            //saveAs("tif", output_dir+File.separator+name);
             run("Close All");
             call("java.lang.System.gc");
      }
 }
 setBatchMode(false); 
 print("Done!");
-
 
 // This function find a string 
 function getSubstring(string, prefix, postfix) {
